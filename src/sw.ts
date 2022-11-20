@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getMessaging } from 'firebase/messaging/sw'
+import { getMessaging, onBackgroundMessage } from 'firebase/messaging/sw'
 
 type ServiceWorkerGlobalScope = any
 
@@ -20,4 +20,12 @@ self.addEventListener('activate', (event) => {
 
 const messaging = getMessaging(app)
 
-console.log('sw getMessaging:', messaging)
+// onBackgroundMessage(messaging, (payload) => {
+//   console.log('background message:', payload);
+//
+//   self.registration.showNotification('Title',
+//     {
+//       body: 'Background Message body.',
+//       icon: '/firebase-logo.png'
+//     });
+// });

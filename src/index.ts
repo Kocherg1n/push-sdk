@@ -1,6 +1,6 @@
 import {initializeApp, FirebaseOptions} from 'firebase/app'
-// import {onBackgroundMessage} from 'firebase/messaging/sw'
-import {isSupported, getMessaging, getToken, onMessage} from 'firebase/messaging'
+import {getMessaging, getToken, onMessage} from 'firebase/messaging'
+
 import './main.css'
 
 type ServiceWorkerGlobalScope = any
@@ -25,19 +25,13 @@ const cfg: FirebaseOptions = {
 
   onMessage(messaging, (payload) => {
     console.log('front message:', payload);
-  });
+    const {notification: {title, body}} = payload
 
-  // onBackgroundMessage(messaging, (payload) => {
-  //   console.log('background message:', payload);
-  //   // Customize notification here
-  //   const notificationTitle = 'Background Message Title';
-  //   const notificationOptions = {
-  //     body: 'Background Message body.',
-  //     icon: '/firebase-logo.png'
-  //   };
-  //
-  //   self.registration.showNotification(notificationTitle,
-  //     notificationOptions);
-  // });
+    self.registration.showNotification(title,
+      {
+        body,
+        icon: '/firebase-logo.png'
+      });
+  });
 
 })()
