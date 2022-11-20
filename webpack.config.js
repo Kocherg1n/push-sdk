@@ -13,7 +13,7 @@ const plugins = {
 module.exports = {
     entry: {
         'app': './src/index.ts',
-        'service-worker': './src/sw.ts'
+        'firebase-messaging-sw': './src/sw.ts'
     },
     module: {
         rules: [

@@ -1,6 +1,5 @@
-import { onBackgroundMessage } from 'firebase/messaging/sw'
 import { initializeApp } from 'firebase/app'
-import { getMessaging, isSupported } from 'firebase/messaging/sw'
+import { getMessaging } from 'firebase/messaging/sw'
 
 type ServiceWorkerGlobalScope = any
 
@@ -19,11 +18,6 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim())
 })
 
-isSupported()
-  .then(() => {
-    const messaging = getMessaging(app)
+const messaging = getMessaging(app)
 
-    console.log('sw-messaging:', messaging)
-
-  })
-  .catch(/* error */)
+console.log('sw init:', messaging)

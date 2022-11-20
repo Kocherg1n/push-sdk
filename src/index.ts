@@ -1,11 +1,14 @@
-import { initializeApp, FirebaseOptions } from 'firebase/app'
-import { isSupported, getMessaging, getToken } from 'firebase/messaging'
+import {initializeApp} from 'firebase/app'
+import {onBackgroundMessage} from 'firebase/messaging/sw'
+import {isSupported, getMessaging, getToken, onMessage} from 'firebase/messaging'
+
+type ServiceWorkerGlobalScope = any
+
+declare let self: ServiceWorkerGlobalScope
 
 import './main.css'
 
 (async () => {
-  const sw = await window.navigator.serviceWorker.register('./service-worker.js')
-
   const supported = await isSupported().catch(() => false)
 
   if (!supported) return
@@ -22,9 +25,31 @@ import './main.css'
   const messaging = getMessaging(app)
 
   const token = await getToken(messaging, {
-    serviceWorkerRegistration: sw
+    vapidKey: 'BMdVLXCtTG3jiuuwlPOiTgmItdpGOzAngJphN-M7oCPJzaqK2pxbzl7-0Ry3vRjFuRc2iAKc3E3PF5SlZfiiuHY'
   })
 
-  console.log('token', token)
+  if (token) {
+    // Send the token to your server and update the UI if necessary
+    console.log('token', token)
+  } else {
+    console.log('No registration token available. Request permission to generate one')
+  }
+
+  onMessage(messaging, (payload) => {
+    console.log('front message:', payload);
+  });
+
+  onBackgroundMessage(messaging, (payload) => {
+    console.log('background message:', payload);
+    // Customize notification here
+    const notificationTitle = 'Background Message Title';
+    const notificationOptions = {
+      body: 'Background Message body.',
+      icon: '/firebase-logo.png'
+    };
+
+    self.registration.showNotification(notificationTitle,
+      notificationOptions);
+  });
 
 })()
