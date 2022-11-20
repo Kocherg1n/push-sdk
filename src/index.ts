@@ -17,21 +17,15 @@ const cfg: FirebaseOptions = {
 } as any
 
 (async () => {
-  const app = initializeApp(cfg)
   const sw = await window.navigator.serviceWorker.register('./sw.js')
+  const app = initializeApp(cfg)
   const messaging = getMessaging(app)
+
   const token = await getToken(messaging, {serviceWorkerRegistration: sw})
   console.log('token', token)
 
   onMessage(messaging, (payload) => {
     console.log('front message:', payload);
-    const {data: {title, body}} = payload
-
-    self.registration.showNotification(title,
-      {
-        body,
-        icon: '/firebase-logo.png'
-      });
   });
 
 })()
