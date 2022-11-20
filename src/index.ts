@@ -25,7 +25,7 @@ const cfg: FirebaseOptions = {
 
   onMessage(messaging, (payload) => {
     console.log('front message:', payload);
-    const {notification: {title, body}} = payload
+    const {data: {title, body}} = payload
 
     self.registration.showNotification(title,
       {
