@@ -27,5 +27,4 @@ const cfg: FirebaseOptions = {
   onMessage(messaging, (payload) => {
     console.log('front message:', payload);
   });
-
 })()
