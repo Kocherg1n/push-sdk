@@ -23,7 +23,7 @@ isSupported()
   .then(() => {
     const messaging = getMessaging(app)
 
-
+    console.log('sw-messaging:', messaging)
 
   })
   .catch(/* error */)

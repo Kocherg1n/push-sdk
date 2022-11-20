@@ -1,6 +1,8 @@
 import { initializeApp, FirebaseOptions } from 'firebase/app'
 import { isSupported, getMessaging, getToken } from 'firebase/messaging'
 
+import './main.css'
+
 (async () => {
   const sw = await window.navigator.serviceWorker.register('./service-worker.js')
 
