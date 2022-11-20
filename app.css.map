@@ -1,0 +1,1 @@
+{"version":3,"file":"app.css","mappings":"AAAA;IACI,4BAA4B;IAC5B,aAAa;IACb,kBAAkB;AACtB","sources":["webpack:///./src/main.css"],"sourcesContent":["body {\n    background-color: aquamarine;\n    height: 100vh;\n    position: relative;\n}\n"],"names":[],"sourceRoot":""}
