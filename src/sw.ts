@@ -20,4 +20,4 @@ self.addEventListener('activate', (event) => {
 
 const messaging = getMessaging(app)
 
-console.log('sw init:', messaging)
+console.log('sw getMessaging:', messaging)

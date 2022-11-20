@@ -9,6 +9,13 @@ declare let self: ServiceWorkerGlobalScope
 import './main.css'
 
 (async () => {
+  try {
+    const sw = await window.navigator.serviceWorker.register('./sw.js')
+    console.log('Registration successful, scope is:', sw.scope);
+  } catch (e) {
+    console.error('Service worker registration failed:', e)
+  }
+
   const supported = await isSupported().catch(() => false)
 
   if (!supported) return
@@ -24,15 +31,13 @@ import './main.css'
 
   const messaging = getMessaging(app)
 
-  const token = await getToken(messaging, {
-    vapidKey: 'BMdVLXCtTG3jiuuwlPOiTgmItdpGOzAngJphN-M7oCPJzaqK2pxbzl7-0Ry3vRjFuRc2iAKc3E3PF5SlZfiiuHY'
-  })
-
-  if (token) {
-    // Send the token to your server and update the UI if necessary
+  try {
+    const token = await getToken(messaging, {
+      vapidKey: 'BMdVLXCtTG3jiuuwlPOiTgmItdpGOzAngJphN-M7oCPJzaqK2pxbzl7-0Ry3vRjFuRc2iAKc3E3PF5SlZfiiuHY'
+    })
     console.log('token', token)
-  } else {
-    console.log('No registration token available. Request permission to generate one')
+  } catch (e) {
+    console.log('get token error:', e)
   }
 
   onMessage(messaging, (payload) => {
