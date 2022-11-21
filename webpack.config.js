@@ -1,3 +1,4 @@
+const CopyPlugin = require("copy-webpack-plugin")
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const path = require('path')
@@ -8,12 +9,17 @@ const plugins = {
         template: 'src/index.html'
     }),
     MiniCssExtractPlugin: new MiniCssExtractPlugin(),
+    CopyPlugin: new CopyPlugin({
+        patterns: [
+            {from: "src/firebase-messaging-sw.js", to: path.resolve(__dirname, 'dist'),}
+        ],
+    })
 }
 
 module.exports = {
     entry: {
         'app': './src/index.ts',
-        'firebase-messaging-sw': './src/sw.ts'
+        // 'firebase-messaging-sw': './src/sw.ts'
     },
     module: {
         rules: [
@@ -54,7 +60,7 @@ module.exports = {
     plugins: [
         plugins.HtmlWebpackPlugin,
         plugins.MiniCssExtractPlugin,
-        // plugins.CopyPlugin
+        plugins.CopyPlugin
 ],
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 }
