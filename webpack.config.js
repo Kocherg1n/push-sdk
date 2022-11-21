@@ -19,7 +19,7 @@ const plugins = {
 module.exports = {
     entry: {
         'app': './src/index.ts',
-        // 'firebase-messaging-sw': './src/sw.ts'
+        'firebase-messaging-sw': './src/sw.ts'
     },
     module: {
         rules: [
