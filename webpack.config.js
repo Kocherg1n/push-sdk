@@ -11,7 +11,8 @@ const plugins = {
     MiniCssExtractPlugin: new MiniCssExtractPlugin(),
     CopyPlugin: new CopyPlugin({
         patterns: [
-            {from: "src/firebase-messaging-sw.js", to: path.resolve(__dirname, 'dist'),}
+            {from: "src/sw.js", to: path.resolve(__dirname, 'dist'),}
+            // {from: "src/firebase-messaging-sw.js", to: path.resolve(__dirname, 'dist'),}
         ],
     })
 }
@@ -19,7 +20,7 @@ const plugins = {
 module.exports = {
     entry: {
         'app': './src/index.ts',
-        'firebase-messaging-sw': './src/sw.ts'
+        // 'firebase-messaging-sw': './src/sw.ts'
     },
     module: {
         rules: [
