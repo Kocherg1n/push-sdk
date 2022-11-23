@@ -55,16 +55,10 @@ const removeToken = async (messaging: Messaging): Promise<void> => {
     await getNewToken(messaging, sw)
 
     onMessage(messaging, (payload) => {
-      console.log('Message received. ', payload);
-      const {title, body, click_action} = payload.data
-
-      const notification = new Notification(title, {body})
-
-      notification.onclick = function (e) {
-        e.preventDefault()
-        window.open(click_action, '_blank')
-        notification.close()
-      }
+      console.log('Message received', payload);
+      // const {title, body} = payload.data
+      //
+      // sw.showNotification(title, {body})
 
     });
   } else {
