@@ -15,6 +15,10 @@ const app = initializeApp({
 
 const messaging = getMessaging(app)
 
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim())
+})
+
 onBackgroundMessage(messaging, (payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
   // Customize notification here
