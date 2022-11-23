@@ -20,8 +20,6 @@ const cfg: FirebaseOptions = {
   appId: "1:696340818215:web:223cc352b22ce50df8a102"
 } as any
 
-const app = initializeApp(cfg)
-
 const requestPermission = async (): Promise<NotificationPermission> => {
   return await Notification.requestPermission()
 }
@@ -47,6 +45,7 @@ const removeToken = async (messaging: Messaging): Promise<void> => {
   const permission = await requestPermission()
 
   if (apiPushExist && permission === 'granted') {
+    const app = initializeApp(cfg)
     const messaging = getMessaging(app)
 
     getTokenBtn.addEventListener('click', () => getNewToken(messaging))
@@ -56,7 +55,13 @@ const removeToken = async (messaging: Messaging): Promise<void> => {
 
     onMessage(messaging, (payload) => {
       console.log('Message received. ', payload);
-      // ...
+      const {title, body, click_action} = payload.data
+
+      self.registration.showNotification(title,
+        {
+          body,
+          click_action
+        });
     });
   } else {
     if (!apiPushExist) {
