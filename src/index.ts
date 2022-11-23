@@ -58,10 +58,14 @@ const removeToken = async (messaging: Messaging): Promise<void> => {
       console.log('Message received. ', payload);
       const {title, body, click_action} = payload.data
 
-      sw.showNotification(title,
-        {
-          body,
-        });
+      const notification = new Notification(title, {body})
+
+      notification.onclick = function (e) {
+        e.preventDefault()
+        window.open(click_action, '_blank')
+        notification.close()
+      }
+
     });
   } else {
     if (!apiPushExist) {
