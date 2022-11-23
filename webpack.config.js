@@ -12,7 +12,7 @@ const plugins = {
     MiniCssExtractPlugin: new MiniCssExtractPlugin(),
     CopyPlugin: new CopyPlugin({
         patterns: [
-            {from: "src/sw.js", to: path.resolve(__dirname, 'dist'),}
+            {from: "src/manifest.json", to: path.resolve(__dirname, 'dist'),}
         ],
     })
 }
@@ -61,7 +61,7 @@ module.exports = {
     plugins: [
         plugins.HtmlWebpackPlugin,
         plugins.MiniCssExtractPlugin,
-        // plugins.CopyPlugin
+        plugins.CopyPlugin
 ],
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 }
