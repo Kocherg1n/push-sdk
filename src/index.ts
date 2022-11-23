@@ -58,10 +58,9 @@ const removeToken = async (messaging: Messaging): Promise<void> => {
       console.log('Message received. ', payload);
       const {title, body, click_action} = payload.data
 
-      self.registration.showNotification(title,
+      sw.showNotification(title,
         {
           body,
-          click_action
         });
     });
   } else {
