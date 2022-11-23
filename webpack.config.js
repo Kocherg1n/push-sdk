@@ -6,13 +6,13 @@ const path = require('path')
 const plugins = {
     HtmlWebpackPlugin: new HtmlWebpackPlugin({
         inject: 'body',
-        template: 'src/index.html'
+        template: 'src/index.html',
+        chunks : ['app'],
     }),
     MiniCssExtractPlugin: new MiniCssExtractPlugin(),
     CopyPlugin: new CopyPlugin({
         patterns: [
             {from: "src/sw.js", to: path.resolve(__dirname, 'dist'),}
-            // {from: "src/firebase-messaging-sw.js", to: path.resolve(__dirname, 'dist'),}
         ],
     })
 }
@@ -20,7 +20,7 @@ const plugins = {
 module.exports = {
     entry: {
         'app': './src/index.ts',
-        // 'firebase-messaging-sw': './src/sw.ts'
+        'firebase-messaging-sw': './src/sw.ts'
     },
     module: {
         rules: [
@@ -61,7 +61,7 @@ module.exports = {
     plugins: [
         plugins.HtmlWebpackPlugin,
         plugins.MiniCssExtractPlugin,
-        plugins.CopyPlugin
+        // plugins.CopyPlugin
 ],
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 }

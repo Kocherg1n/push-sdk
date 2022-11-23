@@ -1,9 +1,9 @@
-type ServiceWorkerGlobalScope = any
-
-declare let self: ServiceWorkerGlobalScope
-
 import { initializeApp } from 'firebase/app'
-import { getMessaging, onBackgroundMessage } from 'firebase/messaging/sw'
+import {getMessaging} from 'firebase/messaging'
+import { onBackgroundMessage } from 'firebase/messaging/sw'
+
+type ServiceWorkerGlobalScope = any
+declare let self: ServiceWorkerGlobalScope
 
 const app = initializeApp({
   apiKey: "AIzaSyBAcp1sqaS-fjIJP_9Ar5lxa1etqllwzUk",

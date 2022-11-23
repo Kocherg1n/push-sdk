@@ -1,5 +1,6 @@
 {
   "homepage": "https://kocherg1n.github.io/push-sdk",
+  "license": "UNLICENSED",
   "scripts": {
     "build": "NODE_ENV='production' webpack",
     "dev": "webpack",
