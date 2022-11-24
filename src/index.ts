@@ -56,9 +56,9 @@ const removeToken = async (messaging: Messaging): Promise<void> => {
 
     onMessage(messaging, (payload) => {
       console.log('Message received', payload);
-      // const {title, body} = payload.data
-      //
-      // sw.showNotification(title, {body})
+      const {title, body} = payload.data
+
+      sw.showNotification(title, {body})
 
     });
   } else {
