@@ -28,9 +28,8 @@ const renderToken = (token: string) => {
   tokenDisplay.textContent = token
 }
 
-const getNewToken = async (messaging: Messaging): Promise<void> => {
-  const sw = await window.navigator.serviceWorker.register('./firebase-messaging-sw.js')
-  const token = await getToken(messaging, {vapidKey: 'BA-EeuWIdVFB0lJ4lAIxq1kxYdZZZE_hg9DZpzZzXXP-h6AxKnJbk5AfgXDj-LSWbkiliz33oIc6XQoXFKlVzNA'})
+const getNewToken = async (messaging: Messaging, sw: any): Promise<void> => {
+  const token = await getToken(messaging, {serviceWorkerRegistration: sw})
   console.log('token', token)
   renderToken(token)
 }
@@ -44,11 +43,13 @@ const removeToken = async (messaging: Messaging): Promise<void> => {
   const apiPushExist = await isSupported()
   const permission = await requestPermission()
 
+
   if (apiPushExist && permission === 'granted') {
     const app = initializeApp(cfg)
     const messaging = getMessaging(app)
+    const sw = await window.navigator.serviceWorker.register('./firebase-messaging-sw.js')
 
-    getTokenBtn.addEventListener('click', () => getNewToken(messaging))
+    getTokenBtn.addEventListener('click', () => getNewToken(messaging, sw))
     removeTokenBtn.addEventListener('click', () => removeToken(messaging))
 
     await getNewToken(messaging, sw)
