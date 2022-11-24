@@ -61,7 +61,7 @@ module.exports = {
     plugins: [
         plugins.HtmlWebpackPlugin,
         plugins.MiniCssExtractPlugin,
-        plugins.CopyPlugin
+        // plugins.CopyPlugin
 ],
     mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 }
