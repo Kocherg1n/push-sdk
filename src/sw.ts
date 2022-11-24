@@ -19,5 +19,5 @@ onBackgroundMessage(messaging, (payload) => {
   console.log('Background message received', payload);
   const {title, body} = payload.data
 
-  self.registration.showNotification(title, {body});
+  return self.registration.showNotification(title, {body});
 });
