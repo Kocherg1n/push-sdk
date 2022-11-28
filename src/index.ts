@@ -70,6 +70,7 @@ const removeToken = async (messaging: Messaging): Promise<void> => {
       sw.showNotification(title, {
         body,
         icon,
+        /*// @ts-ignore */
         click_action,
       })
 
