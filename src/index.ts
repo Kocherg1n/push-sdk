@@ -65,14 +65,15 @@ const removeToken = async (messaging: Messaging): Promise<void> => {
 
     onMessage(messaging, (payload) => {
       console.log('Message received', payload);
-      const {title, body, click_action, icon} = payload.data
 
-      sw.showNotification(title, {
-        body,
-        icon,
-        /*// @ts-ignore */
-        click_action,
-      })
+      const notificationOptions = {
+        body: payload.data.body,
+        icon: payload.data.icon,
+        data: { url:payload.data.click_action },
+        actions: [{action: "open_url", title: "Read Now"}]
+      };
+
+      sw.showNotification(payload.data.title, notificationOptions)
 
     });
   } else {
