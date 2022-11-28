@@ -17,7 +17,11 @@ const messaging = getMessaging(app)
 
 onBackgroundMessage(messaging, (payload: MessagePayload) => {
   console.log('Background message received', payload);
-  const {title, body} = payload.data
+  const {title, body, icon, click_action} = payload.data
 
-  return self.registration.showNotification(title, {body});
+  return self.registration.showNotification(title, {
+    body,
+    icon,
+    click_action
+  });
 });
