@@ -50,7 +50,7 @@ export default class Push extends EventEmitter {
         this._serviceWorker = sw
         this._token = token
 
-        await this._subscribe(options.subscribeParams)
+        await this._subscribe()
 
         onMessage(messaging, (payload) => {
           console.log('Message received', payload)
@@ -76,9 +76,9 @@ export default class Push extends EventEmitter {
     }
   }
 
-  private async _subscribe(subscribeParams: SubscribeParams): Promise<void> {
+  private async _subscribe(): Promise<void> {
     try {
-        console.log(`You are subscribed to the campaign: ${subscribeParams.params.campaignUuid}`)
+        console.log(`You are subscribed to the campaign`)
     } catch (e) {
       console.log('Something went wrong when subscribing:', e)
     }
