@@ -72,8 +72,6 @@ export default class Push extends EventEmitter {
         this._serviceWorker.showNotification(title, notificationOptions)
       }
 
-      console.log('subscribeParams', subscribeParams)
-
     });
   }
 

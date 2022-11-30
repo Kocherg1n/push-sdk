@@ -30,8 +30,12 @@ onBackgroundMessage(messaging, (payload: MessagePayload) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
 
+  console.log('notificationclick', event)
+
   if (!event.notification.data.url) return
   const pathname = event.notification.data.url
+
+  console.log('pathname', pathname)
 
   event.waitUntil(
     self.clients
