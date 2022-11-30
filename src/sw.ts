@@ -1,9 +1,9 @@
 import {initializeApp} from 'firebase/app'
 import {onBackgroundMessage, getMessaging, MessagePayload} from 'firebase/messaging/sw'
 
-declare const self: ServiceWorkerGlobalScope
+type ServiceWorkerGlobalScope = any
+declare let self: ServiceWorkerGlobalScope
 
-// в дальнейшем конфиг будем получать от проекта (сейчас используем который уже есть в базе)
 const app = initializeApp({
   apiKey: "AIzaSyDz56mB2jaGsNq9mPM3tL6Y0yIhwQu7LkQ",
   authDomain: "test-push-service-d2113.firebaseapp.com",
