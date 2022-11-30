@@ -47,34 +47,6 @@ export default class Push extends EventEmitter {
         this._serviceWorker = sw
         this._token = token
 
-        self.addEventListener('notificationclick', (event) => {
-
-          console.log('notificationclick 1', event)
-
-          // event.notification.close()
-          //
-          // if (!event.notification.data.pathname) return
-          // const pathname = event.notification.data.pathname
-          // const url = new URL(pathname, self.location.origin).href
-          //
-          // event.waitUntil(
-          //   self.clients
-          //     .matchAll({ type: 'window', includeUncontrolled: true })
-          //     .then((clientsArr) => {
-          //       const hadWindowToFocus = clientsArr.some((windowClient) =>
-          //         windowClient.url === url ? (windowClient.focus(), true) : false
-          //       )
-          //
-          //       if (!hadWindowToFocus)
-          //         self.clients
-          //           .openWindow(url)
-          //           .then((windowClient) =>
-          //             windowClient ? windowClient.focus() : null
-          //           )
-          //     })
-          // )
-        })
-
         await this._subscribe(messaging, options.subscribeParams)
       } catch {
         console.log('Something went wrong when initializing the application')
