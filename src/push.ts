@@ -78,18 +78,7 @@ export default class Push extends EventEmitter {
 
   private async _subscribe(subscribeParams: SubscribeParams): Promise<void> {
     try {
-      const response = await fetch('https://stage01-crm.rambler.ru/api/v3/project/subscribeToCampaign', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({params: {...subscribeParams, token: this._token}, sessionId: process.env.SESSION_ID})
-      })
-
-      const json: Subscribe = await response.json()
-
-      if (json.success) {
         console.log(`You are subscribed to the campaign: ${subscribeParams.params.campaignUuid}`)
-      }
-
     } catch (e) {
       console.log('Something went wrong when subscribing:', e)
     }
