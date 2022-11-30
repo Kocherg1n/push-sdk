@@ -62,11 +62,10 @@ export default class Push extends EventEmitter {
     onMessage(messaging, (payload) => {
       console.log('Message received', payload)
 
-      const title = payload.data?.title ?? ''
+      const title = payload.notification?.title ?? ''
       const notificationOptions = {
-        body: payload.data?.body,
-        icon: payload.data?.icon,
-        data: {url: payload.data?.click_action}
+        body: payload.notification?.body,
+        data: {url: payload.fcmOptions?.link}
       };
 
       if (this._serviceWorker) {
