@@ -30,24 +30,21 @@ onBackgroundMessage(messaging, (payload: MessagePayload) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close()
 
-  console.log('notificationclick', event)
-
   if (!event.notification.data.url) return
-  const pathname = event.notification.data.url
-
-  console.log('pathname', pathname)
+  const url = event.notification.data.url
 
   event.waitUntil(
     self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })
       .then((clientsArr) => {
+        console.log('clientsArr', clientsArr)
         const hadWindowToFocus = clientsArr.some((windowClient) =>
-          windowClient.url === pathname ? (windowClient.focus(), true) : false
+          windowClient.url === url ? (windowClient.focus(), true) : false
         )
 
         if (!hadWindowToFocus)
           self.clients
-            .openWindow(pathname)
+            .openWindow(url)
             .then((windowClient) =>
               windowClient ? windowClient.focus() : null
             )
