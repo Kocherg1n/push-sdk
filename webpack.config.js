@@ -8,6 +8,7 @@ const plugins = {
         inject: true,
         template: 'src/index.html',
         chunks : ['app'],
+        scriptLoading: 'blocking'
     }),
     MiniCssExtractPlugin: new MiniCssExtractPlugin(),
     CopyPlugin: new CopyPlugin({
