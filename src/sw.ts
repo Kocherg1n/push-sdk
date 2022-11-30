@@ -15,34 +15,6 @@ const app = initializeApp({
 
 const messaging = getMessaging(app)
 
-self.addEventListener('notificationclick', (event) => {
-
-  console.log('notificationclick', event)
-
-  // event.notification.close()
-  //
-  // if (!event.notification.data.pathname) return
-  // const pathname = event.notification.data.pathname
-  // const url = new URL(pathname, self.location.origin).href
-  //
-  // event.waitUntil(
-  //   self.clients
-  //     .matchAll({ type: 'window', includeUncontrolled: true })
-  //     .then((clientsArr) => {
-  //       const hadWindowToFocus = clientsArr.some((windowClient) =>
-  //         windowClient.url === url ? (windowClient.focus(), true) : false
-  //       )
-  //
-  //       if (!hadWindowToFocus)
-  //         self.clients
-  //           .openWindow(url)
-  //           .then((windowClient) =>
-  //             windowClient ? windowClient.focus() : null
-  //           )
-  //     })
-  // )
-})
-
 onBackgroundMessage(messaging, (payload: MessagePayload) => {
   console.log('Background message received', payload);
 
@@ -54,3 +26,27 @@ onBackgroundMessage(messaging, (payload: MessagePayload) => {
 
   return self.registration.showNotification(title, notificationOptions);
 });
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close()
+
+  if (!event.notification.data.url) return
+  const pathname = event.notification.data.url
+
+  event.waitUntil(
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientsArr) => {
+        const hadWindowToFocus = clientsArr.some((windowClient) =>
+          windowClient.url === pathname ? (windowClient.focus(), true) : false
+        )
+
+        if (!hadWindowToFocus)
+          self.clients
+            .openWindow(pathname)
+            .then((windowClient) =>
+              windowClient ? windowClient.focus() : null
+            )
+      })
+  )
+})
