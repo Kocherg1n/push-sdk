@@ -5,7 +5,7 @@ const path = require('path')
 
 const plugins = {
     HtmlWebpackPlugin: new HtmlWebpackPlugin({
-        inject: 'body',
+        inject: true,
         template: 'src/index.html',
         chunks : ['app'],
     }),
