@@ -1,6 +1,6 @@
 import EventEmitter from 'events'
 import {FirebaseOptions, initializeApp} from 'firebase/app'
-import {getMessaging, getToken, onMessage, isSupported, Messaging} from 'firebase/messaging'
+import {getMessaging, getToken, onMessage, isSupported} from 'firebase/messaging'
 
 EventEmitter.defaultMaxListeners = Infinity
 
@@ -18,6 +18,11 @@ interface SubscribeParams {
 interface InitOptions {
   firebaseConfig: FirebaseOptions
   subscribeParams: SubscribeParams
+}
+
+interface Subscribe {
+  success: boolean
+  internalRequestId: string
 }
 
 export default class Push extends EventEmitter {
@@ -42,12 +47,25 @@ export default class Push extends EventEmitter {
         const sw = await window.navigator.serviceWorker.register('./firebase-messaging-sw.js')
         const token = await getToken(messaging, {serviceWorkerRegistration: sw})
 
-        console.log('token', token)
-
         this._serviceWorker = sw
         this._token = token
 
-        await this._subscribe(messaging, options.subscribeParams)
+        await this._subscribe(options.subscribeParams)
+
+        onMessage(messaging, (payload) => {
+          console.log('Message received', payload)
+
+          const title = payload.notification?.title ?? ''
+          const notificationOptions = {
+            body: payload.notification?.body,
+            data: {url: payload.fcmOptions?.link}
+          };
+
+          if (this._serviceWorker) {
+            this._serviceWorker.showNotification(title, notificationOptions)
+          }
+        });
+
       } catch {
         console.log('Something went wrong when initializing the application')
       }
@@ -58,21 +76,23 @@ export default class Push extends EventEmitter {
     }
   }
 
-  private async _subscribe(messaging: Messaging, subscribeParams: SubscribeParams): Promise<void> {
-    onMessage(messaging, (payload) => {
-      console.log('Message received', payload)
+  private async _subscribe(subscribeParams: SubscribeParams): Promise<void> {
+    try {
+      const response = await fetch('https://stage01-crm.rambler.ru/api/v3/project/subscribeToCampaign', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({params: {...subscribeParams, token: this._token}, sessionId: process.env.SESSION_ID})
+      })
 
-      const title = payload.notification?.title ?? ''
-      const notificationOptions = {
-        body: payload.notification?.body,
-        data: {url: payload.fcmOptions?.link}
-      };
+      const json: Subscribe = await response.json()
 
-      if (this._serviceWorker) {
-        this._serviceWorker.showNotification(title, notificationOptions)
+      if (json.success) {
+        console.log(`You are subscribed to the campaign: ${subscribeParams.params.campaignUuid}`)
       }
 
-    });
+    } catch (e) {
+      console.log('Something went wrong when subscribing:', e)
+    }
   }
 
   public init(options: InitOptions): void {

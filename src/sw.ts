@@ -1,9 +1,9 @@
 import {initializeApp} from 'firebase/app'
 import {onBackgroundMessage, getMessaging, MessagePayload} from 'firebase/messaging/sw'
 
-type ServiceWorkerGlobalScope = any
-declare let self: ServiceWorkerGlobalScope
+declare const self: ServiceWorkerGlobalScope
 
+// в дальнейшем конфиг будем получать от проекта (сейчас используем который уже есть в базе)
 const app = initializeApp({
   apiKey: "AIzaSyDz56mB2jaGsNq9mPM3tL6Y0yIhwQu7LkQ",
   authDomain: "test-push-service-d2113.firebaseapp.com",
@@ -31,44 +31,23 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close()
 
   if (!event.notification.data.url) return
-  // const url = event.notification.data.url
+  const url = event.notification.data.url
 
-  const target = event.notification.data.url
-
-  // этот код должен проверять список открытых вкладок и переключатся на открытую
-  // вкладку с ссылкой если такая есть, иначе открывает новую вкладку
+  // если url текущего окна не равен url из notification то окрываем новую вкладку
   event.waitUntil(
-    self.clients.matchAll({
-      type: 'window',
-      includeUncontrolled: true
-    }).then(function (clientList) {
-      // clientList почему-то всегда пуст!?
-      for (let i = 0; i < clientList.length; i++) {
-        const client = clientList[i]
-        if (client.url == target && 'focus' in client) {
-          return client.focus()
-        }
-      }
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientsArr) => {
+        const hadWindowToFocus = clientsArr.some((windowClient) =>
+          windowClient.url === url ? (windowClient.focus(), true) : false
+        )
 
-      // Открываем новое окно
-      return self.clients.openWindow(target);
-    }));
-
-  // event.waitUntil(
-  //   self.clients
-  //     .matchAll({ type: 'window', includeUncontrolled: true })
-  //     .then((clientsArr) => {
-  //       console.log('clientsArr', clientsArr)
-  //       const hadWindowToFocus = clientsArr.some((windowClient) =>
-  //         windowClient.url === url ? (windowClient.focus(), true) : false
-  //       )
-  //
-  //       if (!hadWindowToFocus)
-  //         self.clients
-  //           .openWindow(url)
-  //           .then((windowClient) =>
-  //             windowClient ? windowClient.focus() : null
-  //           )
-  //     })
-  // )
+        if (!hadWindowToFocus)
+          self.clients
+            .openWindow(url)
+            .then((windowClient) =>
+              windowClient ? windowClient.focus() : null
+            )
+      })
+  )
 })
