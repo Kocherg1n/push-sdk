@@ -5,10 +5,9 @@ const path = require('path')
 
 const plugins = {
     HtmlWebpackPlugin: new HtmlWebpackPlugin({
-        inject: true,
+        inject: 'body',
         template: 'src/index.html',
         chunks : ['app'],
-        scriptLoading: 'blocking'
     }),
     MiniCssExtractPlugin: new MiniCssExtractPlugin(),
     CopyPlugin: new CopyPlugin({
