@@ -50,6 +50,8 @@ export default class Push extends EventEmitter {
         this._serviceWorker = sw
         this._token = token
 
+        console.log('token:', token)
+
         await this._subscribe()
 
         onMessage(messaging, (payload) => {
