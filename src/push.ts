@@ -109,6 +109,7 @@ export class Push extends EventEmitter {
         this.firebaseMessagingToken = await getToken(this.firebaseMessaging, {
           serviceWorkerRegistration: this.serviceWorkerRegistration
         })
+        console.log(this.firebaseMessagingToken)
       } catch (error) {
         throw new Error('error with getting firebase messaging token')
       }
