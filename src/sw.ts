@@ -1,53 +1,55 @@
 import {initializeApp} from 'firebase/app'
-import {onBackgroundMessage, getMessaging, MessagePayload} from 'firebase/messaging/sw'
+import {
+  onBackgroundMessage,
+  getMessaging,
+  MessagePayload
+} from 'firebase/messaging/sw'
 
-type ServiceWorkerGlobalScope = any
-declare let self: ServiceWorkerGlobalScope
+/** TODO: настроить типы для self, избавится от any */
+// https://github.com/microsoft/TypeScript/issues/14877
+// https://stackoverflow.com/questions/56356655/structuring-a-typescript-project-with-workers/56374158#56374158
+// declare let self: ServiceWorkerGlobalScope
+declare const self: any
 
-const app = initializeApp({
-  apiKey: "AIzaSyDz56mB2jaGsNq9mPM3tL6Y0yIhwQu7LkQ",
-  authDomain: "test-push-service-d2113.firebaseapp.com",
-  projectId: "test-push-service-d2113",
-  storageBucket: "test-push-service-d2113.appspot.com",
-  messagingSenderId: "212207302903",
-  appId: "1:212207302903:web:b7e41e4ab679a9be6b3bf2",
-})
+self.addEventListener('message', (event: any) => {
+  const firebaseConfig = JSON.parse(event.data)
+  const firebaseApp = initializeApp(firebaseConfig)
+  const firebaseMessaging = getMessaging(firebaseApp)
 
-const messaging = getMessaging(app)
+  onBackgroundMessage(firebaseMessaging, (payload: MessagePayload) => {
+    console.log('onBackgroundMessage:', payload)
 
-onBackgroundMessage(messaging, (payload: MessagePayload) => {
-  console.log('Background message received', payload);
+    const title = payload.notification?.title ?? ''
+    const notificationOptions = {
+      body: payload.notification?.body,
+      data: {url: payload.fcmOptions?.link}
+    }
 
-  const title = payload.notification?.title ?? ''
-  const notificationOptions = {
-    body: payload.notification?.body,
-    data: {url: payload.fcmOptions?.link}
-  };
+    return self.registration.showNotification(title, notificationOptions)
+  })
 
-  return self.registration.showNotification(title, notificationOptions);
-});
+  self.addEventListener('notificationclick', (event: any) => {
+    event.notification.close()
 
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close()
+    if (!event.notification.data.url) return
+    const url = event.notification.data.url
 
-  if (!event.notification.data.url) return
-  const url = event.notification.data.url
+    // если url текущего окна не равен url из notification то окрываем новую вкладку
+    event.waitUntil(
+      self.clients
+        .matchAll({type: 'window', includeUncontrolled: true})
+        .then((clientsArr: any) => {
+          const hadWindowToFocus = clientsArr.some((windowClient: any) =>
+            windowClient.url === url ? (windowClient.focus(), true) : false
+          )
 
-  // если url текущего окна не равен url из notification то окрываем новую вкладку
-  event.waitUntil(
-    self.clients
-      .matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clientsArr) => {
-        const hadWindowToFocus = clientsArr.some((windowClient) =>
-          windowClient.url === url ? (windowClient.focus(), true) : false
-        )
-
-        if (!hadWindowToFocus)
-          self.clients
-            .openWindow(url)
-            .then((windowClient) =>
-              windowClient ? windowClient.focus() : null
-            )
-      })
-  )
+          if (!hadWindowToFocus)
+            self.clients
+              .openWindow(url)
+              .then((windowClient: any) =>
+                windowClient ? windowClient.focus() : null
+              )
+        })
+    )
+  })
 })

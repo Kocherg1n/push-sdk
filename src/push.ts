@@ -1,92 +1,141 @@
 import EventEmitter from 'events'
-import {FirebaseOptions, initializeApp} from 'firebase/app'
-import {getMessaging, getToken, onMessage, isSupported} from 'firebase/messaging'
+
+import {
+  type FirebaseApp,
+  type FirebaseOptions,
+  initializeApp
+} from 'firebase/app'
+import {
+  getMessaging,
+  getToken,
+  onMessage,
+  isSupported,
+  type Messaging
+} from 'firebase/messaging'
 
 EventEmitter.defaultMaxListeners = Infinity
 
-enum Events {
-  INIT = 'init',
-}
-
-interface SubscribeParams {
-  params: {
-    projectUuid: string
-    campaignUuid: string
-  }
-}
-
 interface InitOptions {
   firebaseConfig: FirebaseOptions
-  subscribeParams: SubscribeParams
 }
 
-interface Subscribe {
-  success: boolean
-  internalRequestId: string
-}
+export class Push extends EventEmitter {
+  private firebaseApp: FirebaseApp | undefined
+  private firebaseMessaging: Messaging | undefined
+  private firebaseMessagingToken: string | undefined
 
-export default class Push extends EventEmitter {
-  _token: string | undefined
-  _serviceWorker: ServiceWorkerRegistration | undefined
+  private serviceWorkerRegistration: ServiceWorkerRegistration | undefined
 
   constructor() {
     super()
-
-    this.on(Events.INIT, this._init)
   }
 
-  private async _init(options: InitOptions): Promise<void> {
-    const apiPushExist = await isSupported()
-    const permission = await Notification.requestPermission()
+  public push(callback: () => void): void {
+    callback()
+  }
 
-    if (apiPushExist && permission === 'granted') {
+  public async initialize(options: InitOptions): Promise<void> {
+    const hasFirebaseMessagingSupport = await isSupported()
+    const hasServiceWorkerSupport = 'serviceWorker' in window.navigator
+    const hasGrantedPermission =
+      (await Notification.requestPermission()) === 'granted'
+
+    if (!hasFirebaseMessagingSupport) {
+      console.log('firebase messaging is not supported')
+
+      return
+    }
+
+    if (!hasServiceWorkerSupport) {
+      console.log('service workers are not supported')
+
+      return
+    }
+
+    if (!hasGrantedPermission) {
+      console.log('notifications permission is not granted')
+
+      return
+    }
+
+    try {
+      await this.initFirebaseApp(options.firebaseConfig)
+      await this.registerServiceWorker(options.firebaseConfig)
+      await this.getFirebaseMessagingToken()
+      this.handleMessage()
+    } catch (error: any) {
+      console.log(error.message)
+    }
+  }
+
+  private async initFirebaseApp(
+    firebaseConfig: FirebaseOptions
+  ): Promise<void> {
+    try {
+      this.firebaseApp = initializeApp(firebaseConfig)
+    } catch {
+      throw new Error('error with firebase app initialize')
+    }
+
+    try {
+      this.firebaseMessaging = getMessaging(this.firebaseApp)
+    } catch {
+      throw new Error('error with firebase messaging initialize')
+    }
+  }
+
+  private async registerServiceWorker(
+    firebaseConfig: FirebaseOptions
+  ): Promise<void> {
+    try {
+      this.serviceWorkerRegistration =
+        await window.navigator.serviceWorker.register('./firebase-messaging-sw.js')
+    } catch {
+      throw new Error('error with service-worker register')
+    }
+
+    try {
+      this.serviceWorkerRegistration?.active?.postMessage(
+        JSON.stringify(firebaseConfig)
+      )
+    } catch {
+      throw new Error('error with sending service worker config')
+    }
+  }
+
+  private async getFirebaseMessagingToken(): Promise<void> {
+    if (this.firebaseMessaging) {
       try {
-        const app = initializeApp(options.firebaseConfig)
-        const messaging = getMessaging(app)
+        this.firebaseMessagingToken = await getToken(this.firebaseMessaging, {
+          serviceWorkerRegistration: this.serviceWorkerRegistration
+        })
+      } catch (error) {
+        throw new Error('error with getting firebase messaging token')
+      }
+    }
+  }
 
-        const sw = await window.navigator.serviceWorker.register('./firebase-messaging-sw.js')
-        const token = await getToken(messaging, {serviceWorkerRegistration: sw})
-
-        this._serviceWorker = sw
-        this._token = token
-
-        console.log('token:', token)
-
-        await this._subscribe()
-
-        onMessage(messaging, (payload) => {
-          console.log('Message received', payload)
+  private handleMessage(): void {
+    if (this.firebaseMessaging) {
+      try {
+        onMessage(this.firebaseMessaging, (payload) => {
+          console.log('onMessage', payload)
 
           const title = payload.notification?.title ?? ''
           const notificationOptions = {
             body: payload.notification?.body,
             data: {url: payload.fcmOptions?.link}
-          };
-
-          if (this._serviceWorker) {
-            this._serviceWorker.showNotification(title, notificationOptions)
           }
-        });
 
-      } catch {
-        console.log('Something went wrong when initializing the application')
+          if (this.serviceWorkerRegistration)
+            this.serviceWorkerRegistration.showNotification(
+              title,
+              notificationOptions
+            )
+        })
+      } catch (error) {
+        throw new Error('error with firebase onMessage listener')
       }
-    } else {
-      !apiPushExist
-        ? console.log('Push API not supported')
-        : console.log('Notification permission is: ', permission)
     }
-  }
-
-  private async _subscribe(): Promise<void> {
-    try {
-        console.log(`You are subscribed to the campaign`)
-    } catch (e) {
-      console.log('Something went wrong when subscribing:', e)
-    }
-  }
-
-  public init(options: InitOptions): void {
-    this.emit(Events.INIT, options)
   }
 }
