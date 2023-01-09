@@ -16,17 +16,17 @@ self.addEventListener('message', (event: any) => {
   const firebaseApp = initializeApp(firebaseConfig)
   const firebaseMessaging = getMessaging(firebaseApp)
 
-  onBackgroundMessage(firebaseMessaging, (payload: MessagePayload) => {
-    console.log('onBackgroundMessage:', payload)
-
-    const notificationTitle = payload.notification?.title ?? ''
-    const notificationOptions = {
-      body: payload.notification?.body,
-      data: {url: payload.fcmOptions?.link}
-    }
-
-    return self.registration.showNotification(notificationTitle, notificationOptions)
-  })
+  // onBackgroundMessage(firebaseMessaging, (payload: MessagePayload) => {
+  //   console.log('onBackgroundMessage:', payload)
+  //
+  //   const notificationTitle = payload.notification?.title ?? ''
+  //   const notificationOptions = {
+  //     body: payload.notification?.body,
+  //     data: {url: payload.fcmOptions?.link}
+  //   }
+  //
+  //   return self.registration.showNotification(notificationTitle, notificationOptions)
+  // })
 
   self.addEventListener('notificationclick', (event: any) => {
     event.notification.close()
