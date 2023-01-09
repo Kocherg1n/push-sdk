@@ -17,14 +17,12 @@ self.addEventListener('message', (event: any) => {
   const firebaseMessaging = getMessaging(firebaseApp)
 
   onBackgroundMessage(firebaseMessaging, (payload: MessagePayload) => {
-    delete payload.notification
-
     console.log('onBackgroundMessage:', payload)
 
-    const notificationTitle = 'title'
+    const notificationTitle = payload.notification?.title ?? ''
     const notificationOptions = {
-      body: 'body',
-      data: {url: 'url'}
+      body: payload.notification?.body,
+      data: {url: payload.fcmOptions?.link}
     }
 
     return self.registration.showNotification(notificationTitle, notificationOptions)
