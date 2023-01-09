@@ -19,13 +19,13 @@ self.addEventListener('message', (event: any) => {
   onBackgroundMessage(firebaseMessaging, (payload: MessagePayload) => {
     console.log('onBackgroundMessage:', payload)
 
-    const title = payload.notification?.title ?? ''
+    const notificationTitle = payload.notification?.title ?? ''
     const notificationOptions = {
       body: payload.notification?.body,
       data: {url: payload.fcmOptions?.link}
     }
 
-    return self.registration.showNotification(title, notificationOptions)
+    return self.registration.showNotification(notificationTitle, notificationOptions)
   })
 
   self.addEventListener('notificationclick', (event: any) => {
