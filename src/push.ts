@@ -122,17 +122,16 @@ export class Push extends EventEmitter {
         onMessage(this.firebaseMessaging, (payload) => {
           console.log('onMessage', payload)
 
-          const title = payload.data?.title ?? ''
+          const notificationData = JSON.parse(payload.data.jsonData)
+
+          const notificationTitle = notificationData.data?.title ?? ''
           const notificationOptions = {
-            body: payload.data?.body,
-            data: {url: payload.data?.clickAction}
+            body: notificationData.data?.body,
+            data: {url: notificationData.data?.clickAction}
           }
 
           if (this.serviceWorkerRegistration)
-            this.serviceWorkerRegistration.showNotification(
-              title,
-              notificationOptions
-            )
+            this.serviceWorkerRegistration.showNotification(notificationTitle, notificationOptions)
         })
       } catch (error) {
         throw new Error('error with firebase onMessage listener')

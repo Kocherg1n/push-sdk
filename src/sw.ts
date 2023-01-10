@@ -1,8 +1,8 @@
 import {initializeApp} from 'firebase/app'
 import {
-  onBackgroundMessage,
-  getMessaging,
-  MessagePayload
+    onBackgroundMessage,
+    getMessaging,
+    MessagePayload
 } from 'firebase/messaging/sw'
 
 /** TODO: настроить типы для self, избавится от any */
@@ -12,46 +12,48 @@ import {
 declare const self: any
 
 self.addEventListener('message', (event: any) => {
-  const firebaseConfig = JSON.parse(event.data)
-  const firebaseApp = initializeApp(firebaseConfig)
-  const firebaseMessaging = getMessaging(firebaseApp)
+    const firebaseConfig = JSON.parse(event.data)
+    const firebaseApp = initializeApp(firebaseConfig)
+    const firebaseMessaging = getMessaging(firebaseApp)
 
-  onBackgroundMessage(firebaseMessaging, (payload: MessagePayload) => {
-    console.log('onBackgroundMessage:', payload)
+    onBackgroundMessage(firebaseMessaging, (payload: MessagePayload) => {
+        console.log('onBackgroundMessage:', payload)
 
-    const notificationTitle = payload.data?.title ?? ''
-    const notificationOptions = {
-      body: payload.data?.body,
-      data: {url: payload.data?.clickAction}
-    }
+        const notificationData = JSON.parse(payload.data.jsonData)
 
-    return self.registration.showNotification(notificationTitle, notificationOptions)
-  })
+        const notificationTitle = notificationData.data?.title ?? ''
+        const notificationOptions = {
+            body: notificationData.data?.body,
+            data: {url: notificationData.data?.clickAction}
+        }
 
-  self.addEventListener('notificationclick', (event: any) => {
-    event.notification.close()
+        return self.registration.showNotification(notificationTitle, notificationOptions)
+    })
 
-    console.log('notificationclick event', event)
+    self.addEventListener('notificationclick', (event: any) => {
+        event.notification.close()
 
-    if (!event.notification.data.url) return
-    const url = event.notification.data.url
+        console.log('notificationclick event', event)
 
-    // если url текущего окна не равен url из notification то окрываем новую вкладку
-    event.waitUntil(
-      self.clients
-        .matchAll({type: 'window', includeUncontrolled: true})
-        .then((clientsArr: any) => {
-          const hadWindowToFocus = clientsArr.some((windowClient: any) =>
-            windowClient.url === url ? (windowClient.focus(), true) : false
-          )
+        if (!event.notification.data.url) return
+        const url = event.notification.data.url
 
-          if (!hadWindowToFocus)
+        // если url текущего окна не равен url из notification то окрываем новую вкладку
+        event.waitUntil(
             self.clients
-              .openWindow(url)
-              .then((windowClient: any) =>
-                windowClient ? windowClient.focus() : null
-              )
-        })
-    )
-  })
+                .matchAll({type: 'window', includeUncontrolled: true})
+                .then((clientsArr: any) => {
+                    const hadWindowToFocus = clientsArr.some((windowClient: any) =>
+                        windowClient.url === url ? (windowClient.focus(), true) : false
+                    )
+
+                    if (!hadWindowToFocus)
+                        self.clients
+                            .openWindow(url)
+                            .then((windowClient: any) =>
+                                windowClient ? windowClient.focus() : null
+                            )
+                })
+        )
+    })
 })
