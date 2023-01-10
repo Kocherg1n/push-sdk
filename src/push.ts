@@ -125,7 +125,7 @@ export class Push extends EventEmitter {
           const title = payload.data?.title ?? ''
           const notificationOptions = {
             body: payload.data?.body,
-            data: {url: payload.fcmOptions?.link}
+            data: {url: payload.data?.clickAction}
           }
 
           if (this.serviceWorkerRegistration)

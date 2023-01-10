@@ -22,7 +22,7 @@ self.addEventListener('message', (event: any) => {
     const notificationTitle = payload.data?.title ?? ''
     const notificationOptions = {
       body: payload.data?.body,
-      data: {url: payload.fcmOptions?.link}
+      data: {url: payload.data?.clickAction}
     }
 
     return self.registration.showNotification(notificationTitle, notificationOptions)
@@ -30,6 +30,8 @@ self.addEventListener('message', (event: any) => {
 
   self.addEventListener('notificationclick', (event: any) => {
     event.notification.close()
+
+    console.log('notificationclick event', event)
 
     if (!event.notification.data.url) return
     const url = event.notification.data.url
