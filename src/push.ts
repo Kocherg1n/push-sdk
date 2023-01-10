@@ -122,9 +122,9 @@ export class Push extends EventEmitter {
         onMessage(this.firebaseMessaging, (payload) => {
           console.log('onMessage', payload)
 
-          const title = payload.notification?.title ?? ''
+          const title = payload.data?.title ?? ''
           const notificationOptions = {
-            body: payload.notification?.body,
+            body: payload.data?.body,
             data: {url: payload.fcmOptions?.link}
           }
 

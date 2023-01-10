@@ -19,9 +19,9 @@ self.addEventListener('message', (event: any) => {
   onBackgroundMessage(firebaseMessaging, (payload: MessagePayload) => {
     console.log('onBackgroundMessage:', payload)
 
-    const notificationTitle = payload.notification?.title ?? ''
+    const notificationTitle = payload.data?.title ?? ''
     const notificationOptions = {
-      body: payload.notification?.body,
+      body: payload.data?.body,
       data: {url: payload.fcmOptions?.link}
     }
 
