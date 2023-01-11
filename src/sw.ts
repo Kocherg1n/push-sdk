@@ -5,6 +5,8 @@ import {
     MessagePayload
 } from 'firebase/messaging/sw'
 
+import {NotificationPayloadData, NotificationType} from "./push"
+
 /** TODO: настроить типы для self, избавится от any */
 // https://github.com/microsoft/TypeScript/issues/14877
 // https://stackoverflow.com/questions/56356655/structuring-a-typescript-project-with-workers/56374158#56374158
@@ -19,15 +21,24 @@ self.addEventListener('message', (event: any) => {
     onBackgroundMessage(firebaseMessaging, (payload: MessagePayload) => {
         console.log('onBackgroundMessage:', payload)
 
-        const notificationData = JSON.parse(payload.data.jsonData)
+        const notificationPayloadData: NotificationPayloadData = JSON.parse(payload.data?.jsonData as string)
 
-        const notificationTitle = notificationData.data?.title ?? ''
-        const notificationOptions = {
-            body: notificationData.data?.body,
-            data: {url: notificationData.data?.clickAction}
+        let url = notificationPayloadData.data.clickAction
+
+        if (notificationPayloadData.metadata.messageInfo.type === NotificationType.PROBE) {
+            url = `send?pushMetaData=${notificationPayloadData.metadata}`
         }
 
-        return self.registration.showNotification(notificationTitle, notificationOptions)
+        const notificationTitle = notificationPayloadData.data.title ?? ''
+        const notificationOptions = {
+            body: notificationPayloadData.data.body,
+            data: {url}
+        }
+
+        return self.registration.showNotification(
+            notificationTitle,
+            notificationOptions
+        )
     })
 
     self.addEventListener('notificationclick', (event: any) => {

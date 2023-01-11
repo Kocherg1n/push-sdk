@@ -19,6 +19,35 @@ interface InitOptions {
   firebaseConfig: FirebaseOptions
 }
 
+export enum NotificationType {
+  SIMPLE= 'simpleMessage',
+  PROBE= 'probeMessage',
+}
+
+interface NotificationData {
+  title: string
+  body: string
+  icon: string
+  clickAction: string
+  frontSettings: Record<string, any>
+}
+
+interface NotificationMetaData {
+  version: string
+  sentAt: string
+  messageUuid: string
+  backendVersion: { version: string }
+  messageInfo: {
+    version: NotificationType
+    type: string
+  }
+}
+
+export interface NotificationPayloadData {
+  data: NotificationData
+  metadata: NotificationMetaData
+}
+
 export class Push extends EventEmitter {
   private firebaseApp: FirebaseApp | undefined
   private firebaseMessaging: Messaging | undefined
@@ -122,7 +151,7 @@ export class Push extends EventEmitter {
         onMessage(this.firebaseMessaging, (payload) => {
           console.log('onMessage', payload)
 
-          const notificationData = JSON.parse(payload.data.jsonData)
+          const notificationData: NotificationPayloadData = JSON.parse(payload.data.jsonData)
 
           const notificationTitle = notificationData.data?.title ?? ''
           const notificationOptions = {
