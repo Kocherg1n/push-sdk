@@ -1,11 +1,7 @@
 import {initializeApp} from 'firebase/app'
-import {
-    onBackgroundMessage,
-    getMessaging,
-    MessagePayload
-} from 'firebase/messaging/sw'
+import {onBackgroundMessage, getMessaging} from 'firebase/messaging/sw'
 
-import {NotificationPayloadData, NotificationType} from "./push"
+import {NotificationPayload, NotificationPayloadData, NotificationType} from "./push"
 
 /** TODO: настроить типы для self, избавится от any */
 // https://github.com/microsoft/TypeScript/issues/14877
@@ -18,10 +14,8 @@ self.addEventListener('message', (event: any) => {
     const firebaseApp = initializeApp(firebaseConfig)
     const firebaseMessaging = getMessaging(firebaseApp)
 
-    onBackgroundMessage(firebaseMessaging, (payload: MessagePayload) => {
-        // console.log('onBackgroundMessage:', payload)
-
-        const {data, metadata}: NotificationPayloadData = JSON.parse(payload.data?.jsonData as string)
+    onBackgroundMessage(firebaseMessaging, (payload: NotificationPayload) => {
+        const {data, metadata}: NotificationPayloadData = JSON.parse(payload.data.jsonData as string)
 
         console.log('onBackgroundMessage:', {data, metadata})
 
@@ -36,7 +30,8 @@ self.addEventListener('message', (event: any) => {
         }
 
         if (metadata.messageInfo.version === NotificationType.PROBE && 'text' in data) {
-            const pushDataStr = JSON.stringify({data, metadata})
+            const {from, priority, fcmMessageId} = payload
+            const pushDataStr = JSON.stringify({data, metadata, from, priority, fcmMessageId})
 
             url = `send?pushData=${encodeURI(pushDataStr)}`
             notificationTitle = 'Служебно-отладочное уведомление'
