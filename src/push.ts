@@ -167,12 +167,29 @@ export class Push extends EventEmitter {
         onMessage(this.firebaseMessaging, (payload) => {
           console.log('onMessage', payload)
 
-          const notificationData: NotificationPayloadData = JSON.parse(payload.data.jsonData)
+          const {data, metadata}: NotificationPayloadData = JSON.parse(payload.data?.jsonData as string)
 
-          const notificationTitle = notificationData.data?.title ?? ''
+          let url = ''
+          let notificationTitle = ''
+          let notificationBody = ''
+
+          if (metadata.version === NotificationType.SIMPLE && 'clickAction' in data) {
+            url = data.clickAction
+            notificationTitle = data.title
+            notificationBody = data.body
+          }
+
+          if (metadata.messageInfo.type === NotificationType.PROBE && 'text' in data) {
+            const pushData = {...data, ...metadata}
+
+            url = `send?pushData=${pushData}`
+            notificationTitle = 'Служебно-отладочное уведомление'
+            notificationBody = data.text
+          }
+
           const notificationOptions = {
-            body: notificationData.data?.body,
-            data: {url: notificationData.data?.clickAction}
+            body: notificationBody,
+            data: {url}
           }
 
           if (this.serviceWorkerRegistration)
