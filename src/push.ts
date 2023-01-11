@@ -20,7 +20,7 @@ interface InitOptions {
 }
 
 export enum NotificationType {
-  SIMPLE= 'simpleMessage',
+  SIMPLE= 'simpleNotification',
   PROBE= 'probeMessage',
 }
 
@@ -173,16 +173,16 @@ export class Push extends EventEmitter {
           let notificationTitle = ''
           let notificationBody = ''
 
-          if (metadata.version === NotificationType.SIMPLE && 'clickAction' in data) {
+          if (metadata.messageInfo.version === NotificationType.SIMPLE && 'clickAction' in data) {
             url = data.clickAction
             notificationTitle = data.title
             notificationBody = data.body
           }
 
-          if (metadata.messageInfo.type === NotificationType.PROBE && 'text' in data) {
-            const pushData = {...data, ...metadata}
+          if (metadata.messageInfo.version === NotificationType.PROBE && 'text' in data) {
+            const pushDataStr = JSON.stringify({...data, ...metadata})
 
-            url = `send?pushData=${pushData}`
+            url = `send?pushData=${encodeURI(pushDataStr)}`
             notificationTitle = 'Служебно-отладочное уведомление'
             notificationBody = data.text
           }

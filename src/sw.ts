@@ -36,9 +36,9 @@ self.addEventListener('message', (event: any) => {
         }
 
         if (metadata.messageInfo.version === NotificationType.PROBE && 'text' in data) {
-            const pushData = {...data, ...metadata}
+            const pushDataStr = JSON.stringify({...data, ...metadata})
 
-            url = `send?pushData=${pushData}`
+            url = `send?pushData=${encodeURI(pushDataStr)}`
             notificationTitle = 'Служебно-отладочное уведомление'
             notificationBody = data.text
         }
