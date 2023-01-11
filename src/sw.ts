@@ -19,9 +19,11 @@ self.addEventListener('message', (event: any) => {
     const firebaseMessaging = getMessaging(firebaseApp)
 
     onBackgroundMessage(firebaseMessaging, (payload: MessagePayload) => {
-        console.log('onBackgroundMessage:', payload)
+        // console.log('onBackgroundMessage:', payload)
 
         const {data, metadata}: NotificationPayloadData = JSON.parse(payload.data?.jsonData as string)
+
+        console.log('onBackgroundMessage:', {data, metadata})
 
         let url = ''
         let notificationTitle = ''
@@ -45,6 +47,8 @@ self.addEventListener('message', (event: any) => {
             body: notificationBody,
             data: {url}
         }
+
+        console.log('notificationOptions:', notificationOptions)
 
         return self.registration.showNotification(
             notificationTitle,
