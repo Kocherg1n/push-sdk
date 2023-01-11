@@ -24,12 +24,28 @@ export enum NotificationType {
   PROBE= 'probeMessage',
 }
 
-interface NotificationData {
+interface SimpleNotificationData {
   title: string
   body: string
   icon: string
   clickAction: string
   frontSettings: Record<string, any>
+}
+
+interface ProbeNotificationData {
+  serverTime: string
+  uniqId: string
+  text: string
+  ip: string
+  userAgent: {
+    source: string
+    deviceCategory: string
+    os: string
+    browserType: string
+    browserVersion: string
+    browserMajorVersion: string
+  },
+  domain: string
 }
 
 interface NotificationMetaData {
@@ -44,7 +60,7 @@ interface NotificationMetaData {
 }
 
 export interface NotificationPayloadData {
-  data: NotificationData
+  data: SimpleNotificationData | ProbeNotificationData
   metadata: NotificationMetaData
 }
 

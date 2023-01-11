@@ -21,17 +21,28 @@ self.addEventListener('message', (event: any) => {
     onBackgroundMessage(firebaseMessaging, (payload: MessagePayload) => {
         console.log('onBackgroundMessage:', payload)
 
-        const notificationPayloadData: NotificationPayloadData = JSON.parse(payload.data?.jsonData as string)
+        const {data, metadata}: NotificationPayloadData = JSON.parse(payload.data?.jsonData as string)
 
-        let url = notificationPayloadData.data.clickAction
+        let url = ''
+        let notificationTitle = ''
+        let notificationBody = ''
 
-        if (notificationPayloadData.metadata.messageInfo.type === NotificationType.PROBE) {
-            url = `send?pushMetaData=${notificationPayloadData.metadata}`
+        if (metadata.version === NotificationType.SIMPLE && 'clickAction' in data) {
+            url = data.clickAction
+            notificationTitle = data.title
+            notificationBody = data.body
         }
 
-        const notificationTitle = notificationPayloadData.data.title ?? ''
+        if (metadata.messageInfo.type === NotificationType.PROBE && 'text' in data) {
+            const pushData = {...data, ...metadata}
+
+            url = `send?pushData=${pushData}`
+            notificationTitle = 'Служебно-отладочное уведомление'
+            notificationBody = data.text
+        }
+
         const notificationOptions = {
-            body: notificationPayloadData.data.body,
+            body: notificationBody,
             data: {url}
         }
 
