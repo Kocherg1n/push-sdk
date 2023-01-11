@@ -30,11 +30,9 @@ self.addEventListener('message', (event: any) => {
         }
 
         if (metadata.messageInfo.version === NotificationType.PROBE && 'text' in data) {
-            const {from, priority, fcmMessageId} = payload
-            const pushDataStr = JSON.stringify({data, metadata, from, priority, fcmMessageId})
+            const pushDataStr = JSON.stringify({...payload, data, metadata})
 
-            console.log('1', {data, metadata, from, priority, fcmMessageId})
-            console.log('2', pushDataStr)
+            console.log('1', {...payload, data, metadata})
 
             url = `send?pushData=${encodeURI(pushDataStr)}`
             notificationTitle = 'Служебно-отладочное уведомление'
