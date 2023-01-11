@@ -17,7 +17,7 @@ self.addEventListener('message', (event: any) => {
     onBackgroundMessage(firebaseMessaging, (payload: NotificationPayload) => {
         const {data, metadata}: NotificationPayloadData = JSON.parse(payload.data.jsonData as string)
 
-        console.log('onBackgroundMessage:', {data, metadata})
+        console.log('onBackgroundMessage:', payload)
 
         let url = ''
         let notificationTitle = ''
@@ -32,6 +32,9 @@ self.addEventListener('message', (event: any) => {
         if (metadata.messageInfo.version === NotificationType.PROBE && 'text' in data) {
             const {from, priority, fcmMessageId} = payload
             const pushDataStr = JSON.stringify({data, metadata, from, priority, fcmMessageId})
+
+            console.log('1', {data, metadata, from, priority, fcmMessageId})
+            console.log('2', pushDataStr)
 
             url = `send?pushData=${encodeURI(pushDataStr)}`
             notificationTitle = 'Служебно-отладочное уведомление'
