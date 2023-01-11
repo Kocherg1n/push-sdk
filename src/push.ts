@@ -180,7 +180,7 @@ export class Push extends EventEmitter {
           }
 
           if (metadata.messageInfo.version === NotificationType.PROBE && 'text' in data) {
-            const pushDataStr = JSON.stringify({...data, ...metadata})
+            const pushDataStr = JSON.stringify({data, metadata})
 
             url = `send?pushData=${encodeURI(pushDataStr)}`
             notificationTitle = 'Служебно-отладочное уведомление'
