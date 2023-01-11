@@ -29,13 +29,13 @@ self.addEventListener('message', (event: any) => {
         let notificationTitle = ''
         let notificationBody = ''
 
-        if (metadata.version === NotificationType.SIMPLE && 'clickAction' in data) {
+        if (metadata.messageInfo.version === NotificationType.SIMPLE && 'clickAction' in data) {
             url = data.clickAction
             notificationTitle = data.title
             notificationBody = data.body
         }
 
-        if (metadata.messageInfo.type === NotificationType.PROBE && 'text' in data) {
+        if (metadata.messageInfo.version === NotificationType.PROBE && 'text' in data) {
             const pushData = {...data, ...metadata}
 
             url = `send?pushData=${pushData}`
